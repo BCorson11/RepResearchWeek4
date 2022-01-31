@@ -1,0 +1,46 @@
+---
+title: "Rep Res Week 4"
+author: "BCorson11"
+date: "1/31/2022"
+output: 
+  html_document:
+    keep_md: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Weather Impact Analysis
+
+```{r ImportData}
+setwd("C:/Users/Corson/Desktop/Coursera/Rep Research/Week4")
+
+df <- read.csv("repdata_data_StormData.csv.bz2")
+```
+
+## Which Events are most harmful to the population?
+
+In order to determine which events are most harmful to the population, I decided to look at the number of fatalities and injuries by event type.
+
+```{r PopulationHarm}
+numfatalities <- aggregate(FATALITIES~EVTYPE,df,length)
+names(numfatalities)[2] <- 'num'
+
+totalfatalities <- aggregate(FATALITIES~EVTYPE,df,sum)
+names(totalfatalities)[2] <- 'TotalFatalities'
+
+merge(numfatalities,totalfatalities)
+
+numinjuries <- aggregate(INJURIES~EVTYPE,df,length)
+names(numinjuries)[2] <- 'num'
+
+totalinjuries <- aggregate(INJURIES~EVTYPE,df,sum)
+names(totalinjuries)[2] <- 'TotalInjuries'
+
+merge(numinjuries,totalinjuries)
+
+FullPopHealth <- merge(totalfatalities,totalinjuries, by="EVTYPE")
+
+PopHealth <- subset(FullPopHealth, TotalFatalities != 0 & TotalInjuries != 0)
+```

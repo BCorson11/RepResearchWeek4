@@ -24,6 +24,8 @@ df <- read.csv("repdata_data_StormData.csv.bz2")
 In order to determine which events are most harmful to the population, I decided to look at the number of fatalities and injuries by event type.
 
 ```{r PopulationHarm}
+library(plyr)
+
 numfatalities <- aggregate(FATALITIES~EVTYPE,df,length)
 names(numfatalities)[2] <- 'num'
 
@@ -31,6 +33,12 @@ totalfatalities <- aggregate(FATALITIES~EVTYPE,df,sum)
 names(totalfatalities)[2] <- 'TotalFatalities'
 
 merge(numfatalities,totalfatalities)
+
+toptenfatalities <- head(arrange(totalfatalities, desc(TotalFatalities)), n = 10)
+
+#barplot(toptenfatalities$TotalFatalities, names = toptenfatalities$EVTYPE)
+barplot(toptenfatalities$TotalFatalities ~ toptenfatalities$EVTYPE,
+        horiz = TRUE)
 
 numinjuries <- aggregate(INJURIES~EVTYPE,df,length)
 names(numinjuries)[2] <- 'num'

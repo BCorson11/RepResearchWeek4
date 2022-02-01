@@ -1,0 +1,63 @@
+---
+title: "Rep Res Week 4"
+author: "BCorson11"
+date: "1/31/2022"
+output:
+  html_document:
+    keep_md: yes
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Weather Impact Analysis
+
+```{r ImportData}
+setwd("//NLANFS/fldredir/CorsonW/Desktop/Coursera/Reproducible Research/Week 4")
+df <- read.csv("repdata_data_StormData.csv.bz2")
+```
+
+## Which Events are most harmful to the population?
+
+In order to determine which events are most harmful to the population, I decided to look at the number of fatalities and injuries by event type.
+
+```{r PopulationFatalities}
+library(plyr)
+library(lattice)
+
+numfatalities <- aggregate(FATALITIES~EVTYPE,df,length)
+names(numfatalities)[2] <- 'num'
+
+totalfatalities <- aggregate(FATALITIES~EVTYPE,df,sum)
+names(totalfatalities)[2] <- 'TotalFatalities'
+
+merge(numfatalities,totalfatalities)
+
+topfivefatalities <- head(arrange(totalfatalities, desc(TotalFatalities)), n = 5)
+
+numinjuries <- aggregate(INJURIES~EVTYPE,df,length)
+names(numinjuries)[2] <- 'num'
+
+totalinjuries <- aggregate(INJURIES~EVTYPE,df,sum)
+names(totalinjuries)[2] <- 'TotalInjuries'
+
+merge(numinjuries,totalinjuries)
+
+topfiveinjuries <- head(arrange(totalinjuries, desc(TotalInjuries)), n = 5)
+
+par(mfrow = c(1,2))
+
+FatalitiesPlot <- barchart(EVTYPE ~ TotalFatalities, data = topfivefatalities,
+         xlab = "Number of Fatalities",
+         ylab = "Event Type")
+InjuriesPlot <- barchart(EVTYPE ~ TotalInjuries, data = topfiveinjuries,
+         xlab = "Number of Injuries",
+         ylab = "Event Type")
+
+print(FatalitiesPlot, position=c(0, .5, 1, 1), more=TRUE)
+print(InjuriesPlot, position=c(0, 0, 1, .5))
+```
+
+Above is the information on the event types that resulted in the most fatalities.  
